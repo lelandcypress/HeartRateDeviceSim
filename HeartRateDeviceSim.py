@@ -27,36 +27,36 @@ def normal(stats):
    return stats   
 
 def init():
-    patient_stats={
-    'hr' : None,
-    'bpsys' : None,
-    'bpdia' : None,
-    'oxy' : None}
+    
+    hr = None
+    bpsys =  None
+    bpdia = None
+    oxy = None
+    patient_stats = [hr,bpsys,bpdia,oxy]
     normal(patient_stats)
-    querystring =''
+    patient_stats=tuple(patient_stats)
+    handledataInsertion(patient_stats) 
     #convert the dictionary into a passable string#
-    for stat in dict:
-        querystring = stat[1]
-        print (querystring)
+
+def handledataInsertion(tup):
     
 
-def handledataInsertion(dict):
-    querystring =''
-    #convert the dictionary into a passable string#
-    for stat in dict:
-        querystring = stat[1]
-
-    # creating connection object and passing the string
-    mydb = mysql.connector.connect(
-    host = "localhost",
-    user = "root",
-    password = "password",
-    database = "patient_monitor"
-    )
-    cursor = mydb.cursor()
-    cursor.callproc("sp_addstats",args=(querystring))
-    mydb.commit();
+    # creating connection object and passing the values
+    mydb = {
+    'host' : "localhost",
+    'user' : "root",
+    'password' : "password",
+    'database' : "patient_monitor"}
     
-
+    try:
+        conn = mysql.connector.connect(**mydb)
+        cursor = conn.cursor()
+        cursor.callproc("sp_addstats",args=tup)
+        conn.commit();
+    except mysql.connector.Error as err:
+        print(err)
+    finally:
+        conn.close()
+init()
 
 

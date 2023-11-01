@@ -1,0 +1,63 @@
+-- Create the Patient_Monitor database
+CREATE DATABASE Patient_Monitor;
+
+-- Create the "patientstats" table
+CREATE TABLE patientstats (
+    Id INT AUTO_INCREMENT PRIMARY KEY,
+    heartrate INT NOT NULL,
+    bpsys INT NOT NULL,
+    bpdia INT NOT NULL,
+    oxygensat DECIMAL(5, 2) NOT NULL,
+    datetime TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Create the "personnel" table
+CREATE TABLE personnel (
+    EEID INT NOT NULL PRIMARY KEY,
+    Name VARCHAR(30) NULL,
+    Department VARCHAR(30) NULL,
+    username VARCHAR(30) NULL,
+    password VARCHAR(50) NULL
+);
+
+-- Insert multiple records into the "personnel" table
+INSERT INTO personnel (EEID, Name, Department, username, password)
+VALUES
+    (874932, 'John Smith', 'Doctor', 'drjohnsmith', 'doctor1'),
+    (543210, 'Sarah Johnson', 'Nurse', 'nursesarah', 'nurse1'),
+    (987654, 'David Wilson', 'Nurse', 'nursedavid', 'nurse2'),
+    (123456, 'Emily Davis', 'Pharmacist', 'pharmacistemily', 'pharma1'),
+    (789012, 'Robert Anderson', 'Insurance', 'robertinsurance', 'insurance1'),
+    (345678, 'Mary Brown', 'Doctor', 'drmarybrown', 'doctor2'),
+    (234567, 'Jennifer Lee', 'Nurse', 'nursejennifer', 'nurse3'),
+    (456789, 'William Clark', 'Nurse', 'nursewilliam', 'nurse4'),
+    (567890, 'Elizabeth White', 'Pharmacist', 'pharmaelizabeth', 'pharma2'),
+    (678901, 'Michael Hall', 'Doctor', 'drmichaelhall', 'doctor3'),
+    (24601, 'Jason LaTorre', 'Nerd Herd', 'jasonlatorre@domain.com', 'Password123');
+
+-- Insert 5 patients within the normal range
+INSERT INTO patientstats (heartrate, bpsys, bpdia, oxygensat)
+VALUES
+    (75, 120, 80, 98.5),
+    (78, 119, 82, 98.3),
+    (80, 122, 79, 98.8),
+    (72, 118, 77, 99.0),
+    (77, 121, 80, 97.8),
+    (110, 125, 85, 97.0),
+    (95, 130, 88, 89.5);
+
+
+--Stored Procedure for MySQL--
+
+DELIMITER //
+CREATE PROCEDURE sp_addstats (
+    heartrate INT,
+    bpsys INT,
+    bpdia INT,
+    oxygensat DECIMAL(5,2)
+)
+BEGIN
+    INSERT INTO patientstats (heartrate, bpsys, bpdia, oxygensat)
+    VALUES (heartrate, bpsys, bpdia, oxygensat);
+END//
+DELIMITER ;
