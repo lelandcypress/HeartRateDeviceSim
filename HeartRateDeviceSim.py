@@ -49,7 +49,7 @@ def start_animation():
         line.set_data([], [])
         return line,
 
-# Create a function to update the plot
+    # Create a function to update the plot
     def update(frame):
         condition='normal'
         if frame % reset_frame_interval == 0:
@@ -63,11 +63,11 @@ def start_animation():
         ax.autoscale_view()
         return line,
 
-# Define the maximum frame and the frame to reset at
+    # Define the maximum frame and the frame to reset at
     max_frame = 100
     reset_frame_interval = 99
 
-# Create a figure and an axis
+    # Create a figure and an axis
     fig, ax = plt.subplots()
     plt.title('Heart Rate Monitor')
     plt.xlabel('Time')
@@ -100,11 +100,43 @@ def makebeep():
          #os.system(f'beep -f 1000 -l {duration}') linux version
          #time.sleep(duration / 1000.0) linux version
 
+
+def addToDB():
+     # creating connection object and passing the values
+    heart_rate= random.randint(70,80)
+    systolic = random.randint(110,120)
+    diastolic = random.randint(70,80)
+    oxygen = round(random.uniform(96.0,99.00),2)  
+    stats = [heart_rate,systolic,diastolic,oxygen]
+    
+    mydb = {
+    'host' : "localhost",
+    'user' : "root",
+    'password' : "password",
+    'database' : "patient_monitor"}
+    
+    try:
+        conn = mysql.connector.connect(**mydb)
+        cursor = conn.cursor()
+        cursor.callproc("sp_addstats",args=stats)
+        conn.commit();
+    except mysql.connector.Error as err:
+        print(err)
+    finally:
+        conn.close()
+
+#Initialize Threads
+db_thread =threading.Thread(target=addToDB)
 animation_thread = threading.Thread(target=start_animation)
 beep_thread = threading.Thread(target=makebeep)
+
+#Start Threads
+db_thread.start()
 animation_thread.start()
 beep_thread.start()
 
+#Join Threads
+db_thread.join()
 animation_thread.join()
 beep_thread.join()
 
@@ -117,23 +149,7 @@ beep_thread.join()
     
 
 #
-def handledataInsertion(tup):
-     # creating connection object and passing the values
-    mydb = {
-    'host' : "localhost",
-    'user' : "root",
-    'password' : "password",
-    'database' : "patient_monitor"}
-    
-    try:
-        conn = mysql.connector.connect(**mydb)
-        cursor = conn.cursor()
-        cursor.callproc("sp_addstats",args=tup)
-        conn.commit();
-    except mysql.connector.Error as err:
-        print(err)
-    finally:
-        conn.close()
+
 
 #set up a list to store the ranges
 #   O2, Heart Rate, BP
