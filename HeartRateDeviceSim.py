@@ -79,26 +79,23 @@ def start_animation():
     x_data = []
     y_data = []
 
-
 # Create a line plot
     line, = ax.plot([], [], lw=2)
 
 # Create the animation
     ani = animation.FuncAnimation(fig, update, frames=max_frame, init_func=init, blit=True)
-
-
     plt.show()
     
 def makebeep():
     bpm = 80
     duration = int(40000 / bpm)
-    num_beats = 100
     
-    for _ in range(num_beats):
-         winsound.Beep(1000, duration)
-         time.sleep(duration / 1000.0)
-         #os.system(f'beep -f 1000 -l {duration}') linux version
-         #time.sleep(duration / 1000.0) linux version
+    try: 
+        while True:
+            winsound.Beep(1000, duration)
+            time.sleep(duration / 1000.0)
+    except KeyboardInterrupt:
+        print("Stopped")
 
 
 def addToDB():
@@ -117,9 +114,11 @@ def addToDB():
     
     try:
         conn = mysql.connector.connect(**mydb)
+        print("Connection opened")
         cursor = conn.cursor()
         cursor.callproc("sp_addstats",args=stats)
-        conn.commit();
+        print("Patient stats logged")
+        conn.commit()
     except mysql.connector.Error as err:
         print(err)
     finally:
@@ -148,23 +147,9 @@ beep_thread.join()
         
     
 
-#
-
-
-#set up a list to store the ranges
-#   O2, Heart Rate, BP
-#  Set up a while true loop
-#   Set up a function that changes the values 
-        # Increase HR 
-            # Account for change in O2 and HR
 
 #Verion 2.0:
-    # Add While True
-        #Time out to update every 3 minutes
-    # Add logging
-        # Comments indicating connections opening and closing 
-    # Add pygame 
-        # Add graphics and sounds
     # Deploy to RPI Image
- #Version 3.0:
-    # Add 
+        #Requirements.txt file needed
+    #Features:
+        # Track BP/O2
