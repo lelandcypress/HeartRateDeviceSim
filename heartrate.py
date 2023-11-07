@@ -24,20 +24,16 @@ def heartrateVisual():
     black = (0,0,0,255)
     green =(61,183,33,255)
     blue = (0,0,255,255)
-       #BPM
-    hrtext = font.render('Pulse 60', True, green, black) 
-    hrtext_display = hrtext.get_rect()
-    hrtext_display.center = (size[0]*.9,size[1]*.33)
-        #Blood Pressure
-    bptext = bpfont.render('BP 120/80', True, red, black) 
-    bptext_display = bptext.get_rect()
-    bptext_display.center = (size[0]*.9,size[1]//2)
-        #O2Sat
-    oxtext = font.render('O2 90.0', True, blue, black) 
-    oxtext_display = oxtext.get_rect()
-    oxtext_display.center = (size[0]*.9,size[1]*.75)
-    clock = pygame.time.Clock()
-    alive = True
+    
+    def patient_stats():
+        global hr,sys, dia, ox
+        while True:
+            hr= random.randint(70,80)
+            sys = random.randint(110,120)
+            dia = random.randint(70,80)
+            ox = round(random.uniform(97.00,99.00),2)
+            time.sleep(15)
+    threading.Thread(target=patient_stats,daemon=True).start()
 
     # Drawing a nested display to get the fade out effect
     drawing = pygame.Surface(size, flags=pygame.SRCALPHA)
@@ -64,6 +60,8 @@ def heartrateVisual():
     time_between_breaths = timedelta(milliseconds=1150)
     last_time_triggered= datetime.now()
     last_breath = datetime.now()
+    alive = True
+
 
 
     # Main Loop#
@@ -76,6 +74,20 @@ def heartrateVisual():
                 pygame.display.quit()
                 alive=False
         
+
+        hrtext = font.render(f'Pulse {hr}', True, green, black) 
+        hrtext_display = hrtext.get_rect()
+        hrtext_display.center = (size[0]*.9,size[1]*.33)
+        #Blood Pressure
+        bptext = bpfont.render(f'BP {sys}/{dia}', True, red, black) 
+        bptext_display = bptext.get_rect()
+        bptext_display.center = (size[0]*.9,size[1]//2)
+        #O2Sat
+        oxtext = font.render(f'O2 {ox} ', True, blue, black) 
+        oxtext_display = oxtext.get_rect()
+        oxtext_display.center = (size[0]*.9,size[1]*.75)
+        clock = pygame.time.Clock()    
+
         next_ptr = ptr+speed
         next_breathptr = brptr + speed 
 
@@ -181,51 +193,20 @@ def addToDB():
         conn.close()
 
 
-
-heartrateVisual()
-
-#db_thread =threading.Thread(target=addToDB)
-#animation_thread = threading.Thread(target=heartrateVisual)
-#beep_thread = threading.Thread(target=makebeep)
+db_thread =threading.Thread(target=addToDB)
+animation_thread = threading.Thread(target=heartrateVisual)
+beep_thread = threading.Thread(target=makebeep)
 
 #Start Threads
-#db_thread.start()
-#animation_thread.start()
-#beep_thread.start()
+db_thread.start()
+animation_thread.start()
+beep_thread.start()
 
 #Join Threads
-#db_thread.join()
-#animation_thread.join()
-#beep_thread.join()
+db_thread.join()
+animation_thread.join()
+beep_thread.join()
 
 
 
 
-#def generate_heart_rate_data(condition):
-# match condition:
-#     case 'normal':
-#               
-# 
-#     case 'tachycardia':
-#         heart_rate = random.randint(110,130)
-#         systolic = random.randint(120,130)
-#         diastolic = random.randint(80,90)
-#         oxygen = round(random.uniform(95.0,97.00),2)
-# 
-#     case 'myocardia infarction':
-#         heart_rate = random.randint(70,80)
-#         systolic = random.randint(120,160)
-#         diastolic = random.randint(70,80)
-#         oxygen = round(random.uniform(92.0,95.00),2)   
-#     
-#     case 'recovery':
-#         heart_rate = random.randint(70,80)
-#         systolic = random.randint(110,120)
-#         diastolic = random.randint(70,80)
-#         oxygen = round(random.uniform(96.0,99.00),2)
-#     case 'heart failure':
-#         heart_rate = 0
-#         systolic = 0
-#         diastolic = 0
-#         oxygen = round(random.uniform(85.00,90.00),2)
-# return heart_rate
