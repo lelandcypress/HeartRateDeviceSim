@@ -6,7 +6,7 @@ import time
 import mysql.connector
 import threading
 import random
-import math
+
 
 def heartrateVisual():
 # Initialize Pygame
@@ -49,15 +49,21 @@ def heartrateVisual():
     speed = 5
     #pointer
     ptr= -1
-    last_height = size[1] //3 
-    # OG : pulse_part = [0,1,0,0,6,0,-5,0,0,-1,0,0,2,0]
+    brptr =-1
+    last_height = size[1] //3
+    last_breath_height = size[1]*.75
+    
     #pulse tracker
     pulse_part = [0,1,0,0,6,0,-5,0,0,-1,0,0,2,0]
+    breath_part = [0,1,2,3,4,5,6,7,8,9,9,10,10,10,10,9,9,8,7,6,5,4,3]
+    breath_position = -1
     pulse_position = -1
     vert_scale_factor = 10
 
     time_between_pulse = timedelta(milliseconds=750)
+    time_between_breaths = timedelta(milliseconds=1150)
     last_time_triggered= datetime.now()
+    last_breath = datetime.now()
 
 
     # Main Loop#
@@ -71,6 +77,7 @@ def heartrateVisual():
                 alive=False
         
         next_ptr = ptr+speed
+        next_breathptr = brptr + speed 
 
         now = datetime.now()
         if now - last_time_triggered > time_between_pulse:
@@ -87,24 +94,53 @@ def heartrateVisual():
         else:
             next_height = last_height
         
+        
+
+        if now - last_breath > time_between_breaths:
+            last_breath = now
+            breath_position = 0
+
+        if breath_position >= 0:
+            if breath_position >= len(breath_part):
+                breath_position = -1
+                next_breath_height = size[1] *.75
+            else:
+                next_breath_height = (size[1] *.75) - (breath_part[breath_position] * vert_scale_factor)
+                breath_position += 1
+        else:
+            next_breath_height = last_breath_height
 
 
         drawing.blit(alpha_surf, (0,0), special_flags=pygame.BLEND_RGBA_MULT)
 
         pygame.draw.line(drawing,green,(ptr,last_height),(next_ptr,next_height),4)
         # Increments pointer to the end of the screen and resets the line to 0 pixels on x axis
-        
+        pygame.draw.line(drawing,blue,(brptr,last_breath_height),(next_breathptr,next_breath_height),4)
+
         monitor_screen.blit(drawing,(0,0))
         monitor_screen.blit(hrtext,hrtext_display)
         monitor_screen.blit(bptext,bptext_display)
         monitor_screen.blit(oxtext,oxtext_display)
         pygame.display.flip()
         
+
+
         if next_ptr > size[0]*0.8:
             ptr= 0
         else:
             ptr=next_ptr
         last_height= next_height
+
+        if next_ptr > size[0]*0.8:
+            brptr= 0
+        else:
+            brptr=next_breathptr
+        last_breath_height= next_breath_height
+
+
+
+
+
         clock.tick(30) 
 
 
@@ -168,10 +204,7 @@ heartrateVisual()
 #def generate_heart_rate_data(condition):
 # match condition:
 #     case 'normal':
-#         heart_rate= random.randint(70,80)
-#         systolic = random.randint(110,120)
-#         diastolic = random.randint(70,80)
-#         oxygen = round(random.uniform(96.0,99.00),2)      
+#               
 # 
 #     case 'tachycardia':
 #         heart_rate = random.randint(110,130)
