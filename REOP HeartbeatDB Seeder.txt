@@ -1,3 +1,5 @@
+DROP DATABASE IF EXISTS Patient_Monitor;
+
 -- Create the Patient_Monitor database
 CREATE DATABASE Patient_Monitor;
 
