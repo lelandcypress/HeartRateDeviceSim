@@ -180,10 +180,10 @@ def addToDB():
     stats = [heart_rate,systolic,diastolic,oxygen]
     
     mydb = {
-    'host' : "localhost",
+    'host' : "10.1.2.8",
     'user' : "root",
-    'password' : "password",
-    'database' : "patient_monitor"}
+    'password' : "jacaladmin",
+    'database' : "hospital_info"}
     
     try:
         conn = mysql.connector.connect(**mydb)
